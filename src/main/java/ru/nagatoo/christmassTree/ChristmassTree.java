@@ -1,3 +1,5 @@
+package ru.nagatoo.christmassTree;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -10,9 +12,10 @@ public class ChristmassTree {
 
     private boolean alwaysOnTop = false;
 
-    ImagePanel panel;
-    MetaDataClass metaDataClass = null;
-    JFrame frame = new JFrame();
+    private ImagePanel panel;
+    private MetaDataClass metaDataClass = null;
+    private JFrame frame = new JFrame();
+
     public ChristmassTree() {
         try {
             FileInputStream fis = new FileInputStream("temp.out");
@@ -28,9 +31,9 @@ public class ChristmassTree {
     private void addListeners() {
         frame.addMouseListener(new MouseListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2) {
-                    if(e.getButton() == 3) {
+            public void mouseClicked(MouseEvent event) {
+                if(event.getClickCount() == 2) {
+                    if(event.getButton() == 3) {
                         saveLocation();
                         try {
                             FileOutputStream fos = new FileOutputStream("temp.out");
@@ -39,19 +42,15 @@ public class ChristmassTree {
                             oos.flush();
                             oos.close();
                         } catch (IOException ioe) {
-                            JOptionPane.showMessageDialog(null, "Файл не найден");
+                            JOptionPane.showMessageDialog(null, "Файл не найден", "Ошибка", JOptionPane
+                                .ERROR_MESSAGE);
                         }
-
                         System.exit(0);
                     }
                     makeNewTree();
                 }
-                if (e.getButton() == 2) {
-                    if(alwaysOnTop) {
-                        alwaysOnTop = false;
-                    } else {
-                        alwaysOnTop = true;
-                    }
+                if (event.getButton() == 2) {
+                    alwaysOnTop = !alwaysOnTop;
                     frame.setAlwaysOnTop(alwaysOnTop);
                 }
             }
@@ -88,12 +87,16 @@ public class ChristmassTree {
         });
     }
 
-
     private void paintTree() {
         frame.dispose();
         frame = new JFrame();
         addListeners();
-        panel = new ImagePanel(metaDataClass.file.toString());
+        String filePath = metaDataClass.file.toString();
+        if (!new File(filePath).exists()) {
+            makeNewTree();
+            return;
+        }
+        panel = new ImagePanel(filePath);
         frame.getContentPane().add(panel);
         frame.setUndecorated(true);
         frame.setBackground(new Color(0,0,0,0));
@@ -108,9 +111,7 @@ public class ChristmassTree {
     }
 
     private void makeNewTree() {
-
         saveLocation();
-
         JFileChooser fileopen = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
             "Только гифки, только хардкор", "gif", "gif");
@@ -131,18 +132,13 @@ public class ChristmassTree {
     }
 
     public static void main(String [] p) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-                new ChristmassTree();
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            new ChristmassTree();
         });
     }
 }

@@ -1,3 +1,5 @@
+package ru.nagatoo.christmassTree;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -8,5 +10,4 @@ public class MetaDataClass implements Serializable {
     public int windowY = 0;
     public boolean firstRun = true;
     public File file = null;
-
 }
